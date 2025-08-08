@@ -1,6 +1,13 @@
 # Big Floating Chess Timer 🏁⏱️
 
-A draggable, feature-rich timer overlay for Chess.com that provides enhanced visual and audio feedback based on remaining time.
+A Tampermonkey userscript that adds a draggable, feature-rich timer overlay to that popular chess website with enhanced visual and audio feedback based on remaining time. IT DOES NOT INTERFERE OR INTERACT WITH THE GAME IN ANY WAY.
+
+Installation
+
+Open Tampermonkey and create a new script
+Replace all the template code with this userscript
+Save (Ctrl+S or Cmd+S) and navigate to any Chess.com game
+Done! The timer will appear automatically during games
 
 ![Chess Timer Demo](https://img.shields.io/badge/Chess.com-Compatible-green) ![Version](https://img.shields.io/badge/Version-2025--08--08-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
