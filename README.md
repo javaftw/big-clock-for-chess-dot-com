@@ -6,7 +6,7 @@ Installation
 
 Open Tampermonkey and create a new script
 Replace all the template code with this userscript
-Save (Ctrl+S or Cmd+S) and navigate to any Chess.com game
+Save (Ctrl+S or Cmd+S) and navigate to any that popular chess website  game
 Done! The timer will appear automatically during games
 
 ![Chess Timer Demo](https://img.shields.io/badge/Chess.com-Compatible-green) ![Version](https://img.shields.io/badge/Version-2025--08--08-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -49,14 +49,14 @@ Done! The timer will appear automatically during games
 2. Click "Create a new script"
 3. Copy and paste the entire script
 4. Save (Ctrl+S)
-5. Navigate to any Chess.com game
+5. Navigate to any that popular chess website  game
 
 ### Other Userscript Managers
 Compatible with Greasemonkey, Violentmonkey, and similar extensions.
 
 ## Usage
 
-1. **Start a game** on Chess.com - Timer appears automatically
+1. **Start a game** on that popular chess website  - Timer appears automatically
 2. **Drag to position** - Click and drag to move anywhere on screen
 3. **Audio permissions** - Browser may ask for audio permission on first beep
 4. **Multiple games** - Timer resets automatically for each new game
@@ -106,7 +106,7 @@ timeText.style.color = "#ff9800";              // Orange
 ## Development
 
 ### Script Structure
-- **Clock detection** - Monitors Chess.com's clock elements
+- **Clock detection** - Monitors that popular chess website 's clock elements
 - **Phase calculation** - Determines current time phase
 - **Visual updates** - Manages colors, animations, and effects
 - **Audio system** - Handles Web Audio API for notifications
@@ -122,7 +122,7 @@ timeText.style.color = "#ff9800";              // Orange
 
 1. Fork the repository
 2. Create a feature branch
-3. Test on Chess.com
+3. Test on that popular chess website 
 4. Submit a pull request
 
 ### Roadmap
@@ -138,9 +138,9 @@ MIT License - Feel free to modify and distribute.
 ## Support
 
 - **Issues** - Report bugs via GitHub issues
-- **Compatibility** - Tested on Chess.com's current interface
+- **Compatibility** - Tested on that popular chess website 's current interface
 - **Updates** - Script auto-updates through Tampermonkey
 
 ---
 
-*Enhance your Chess.com experience with better time awareness! 🚀*
+*Enhance that popular chess website experience with better time awareness! *
