@@ -4,6 +4,10 @@ A draggable, feature-rich timer overlay for Chess.com that provides enhanced vis
 
 ![Chess Timer Demo](https://img.shields.io/badge/Chess.com-Compatible-green) ![Version](https://img.shields.io/badge/Version-2025--08--08-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
+<img width="240" height="179" alt="image" src="https://github.com/user-attachments/assets/53f7a096-6e23-48b7-9634-694ff5320f3b" />
+<img width="217" height="162" alt="image" src="https://github.com/user-attachments/assets/c39b83e3-d005-4f81-a07b-ac4286249102" />
+<img width="218" height="161" alt="image" src="https://github.com/user-attachments/assets/9e8624e8-9e14-483e-9cde-6eb9dae5e066" />
+
 ## Features
 
 ### 🎯 Visual Alerts
@@ -100,10 +104,6 @@ timeText.style.color = "#ff9800";              // Orange
 - **Visual updates** - Manages colors, animations, and effects
 - **Audio system** - Handles Web Audio API for notifications
 - **Drag system** - Implements draggable functionality
-<img width="240" height="179" alt="image" src="https://github.com/user-attachments/assets/53f7a096-6e23-48b7-9634-694ff5320f3b" />
-
-<img width="217" height="162" alt="image" src="https://github.com/user-attachments/assets/c39b83e3-d005-4f81-a07b-ac4286249102" />
-<img width="218" height="161" alt="image" src="https://github.com/user-attachments/assets/9e8624e8-9e14-483e-9cde-6eb9dae5e066" />
 
 
 ### Key Functions
