@@ -2,8 +2,8 @@
 // @name         Big Floating Chess Timer
 // @namespace    http://tampermonkey.net/
 // @version      2025-08-08
-// @description  Draggable chess timer for popular chess website with progress bar, instant movement, turn-based border pulse, and dynamic visual alerts
-// @author       javaftw
+// @description  Draggable chess.com timer with progress bar, instant movement, turn-based border pulse, and dynamic visual alerts based on game fraction 😎
+// @author       You
 // @match        https://www.chess.com/game/*
 // @grant        none
 // ==/UserScript==
@@ -15,8 +15,8 @@
     const bigClock = document.createElement("div");
     bigClock.id = "bigChessClock";
     bigClock.style.position = "fixed";
-    bigClock.style.top = "500px";
-    bigClock.style.left = "1100px";
+    bigClock.style.top = "50px";
+    bigClock.style.left = "50px";
     bigClock.style.zIndex = "9999";
     bigClock.style.fontFamily = "monospace";
     bigClock.style.color = "white";
@@ -247,26 +247,53 @@
 
     setInterval(updateClock, 200);
 
-    // Draggable
+    // Draggable (mouse and touch)
     let isDragging = false;
     let offsetX = 0;
     let offsetY = 0;
 
-    bigClock.addEventListener('mousedown', function (e) {
+    function startDrag(clientX, clientY) {
         isDragging = true;
-        offsetX = e.clientX - bigClock.offsetLeft;
-        offsetY = e.clientY - bigClock.offsetTop;
+        offsetX = clientX - bigClock.offsetLeft;
+        offsetY = clientY - bigClock.offsetTop;
+    }
+
+    function drag(clientX, clientY) {
+        if (isDragging) {
+            bigClock.style.left = (clientX - offsetX) + 'px';
+            bigClock.style.top = (clientY - offsetY) + 'px';
+        }
+    }
+
+    function endDrag() {
+        isDragging = false;
+    }
+
+    // Mouse events
+    bigClock.addEventListener('mousedown', function (e) {
+        startDrag(e.clientX, e.clientY);
         e.preventDefault();
     });
 
     document.addEventListener('mousemove', function (e) {
+        drag(e.clientX, e.clientY);
+    });
+
+    document.addEventListener('mouseup', endDrag);
+
+    // Touch events
+    bigClock.addEventListener('touchstart', function (e) {
+        const touch = e.touches[0];
+        startDrag(touch.clientX, touch.clientY);
+        e.preventDefault();
+    });
+
+    document.addEventListener('touchmove', function (e) {
         if (isDragging) {
-            bigClock.style.left = (e.clientX - offsetX) + 'px';
-            bigClock.style.top = (e.clientY - offsetY) + 'px';
+            const touch = e.touches[0];
+            drag(touch.clientX, touch.clientY);
         }
     });
 
-    document.addEventListener('mouseup', function () {
-        isDragging = false;
-    });
+    document.addEventListener('touchend', endDrag);
 })();
