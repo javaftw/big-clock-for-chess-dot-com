@@ -301,8 +301,9 @@
             hasPlayedTimeUpTune = false;
         }
 
-        // Check if time has reached zero - use string comparison for accuracy
-        if (isMyTurn && timeStr === "0:00" && !hasPlayedTimeUpTune) {
+        // Check if time has reached zero - detect 0.1s or less as "zero"
+        const isTimeUp = timeStr === "0:00" || (timeStr.includes(':') && parseFloat(timeStr.split(':')[1]) <= 0.1);
+        if (isMyTurn && isTimeUp && !hasPlayedTimeUpTune) {
             stopDoubleBeep();
             stopFontPulse();
             playTimeUpTune();
@@ -310,7 +311,8 @@
         }
 
         // Skip normal phase logic if time is at zero
-        if (timeStr === "0:00") {
+        if (isTimeUp) {
+            timeText.textContent = "0:00"; // Display as 0:00 when time is up
             return;
         }
 
