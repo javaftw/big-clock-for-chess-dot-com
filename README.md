@@ -1,146 +1,100 @@
-# Big Floating Chess Timer 🏁⏱️
+# Big Floating Chess Timer
 
-A Tampermonkey userscript that adds a draggable, feature-rich timer overlay to that popular chess website with enhanced visual and audio feedback based on remaining time. IT DOES NOT INTERFERE OR INTERACT WITH THE GAME IN ANY WAY.
-
-Installation
-
-Open Tampermonkey and create a new script
-Replace all the template code with this userscript
-Save (Ctrl+S or Cmd+S) and navigate to any that popular chess website  game
-Done! The timer will appear automatically during games
-
-![Chess Timer Demo](https://img.shields.io/badge/Chess.com-Compatible-green) ![Version](https://img.shields.io/badge/Version-2025--08--08-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
-
-<img width="240" height="179" alt="image" src="https://github.com/user-attachments/assets/53f7a096-6e23-48b7-9634-694ff5320f3b" />
-<img width="217" height="162" alt="image" src="https://github.com/user-attachments/assets/c39b83e3-d005-4f81-a07b-ac4286249102" />
-<img width="218" height="161" alt="image" src="https://github.com/user-attachments/assets/9e8624e8-9e14-483e-9cde-6eb9dae5e066" />
-
-## Features
-
-### 🎯 Visual Alerts
-- **Large, readable display** - 72px monospace font for clear time visibility
-- **Dynamic color coding** - Green → Orange → Red based on time remaining
-- **Progress bar** - Visual representation of time remaining
-- **Pulsing effects** - Border pulses during your turn, font scales during critical time
-- **Background alerts** - Red background pulse during final phase
-
-### 🔊 Audio Notifications
-- **Warning beep** (800Hz) - Single beep when reaching 2/3 time threshold
-- **Critical beeps** (1200Hz) - Beep on every turn during final 1/6 of time
-- **Smooth audio** - Fade-in/fade-out for pleasant sound experience
-
-### 🎛️ Interactive Features
-- **Fully draggable** - Position anywhere on screen
-- **Turn-based display** - Dimmed when not your turn
-- **Auto-reset** - Adapts to new games automatically
-
-## Phase Breakdown
-
-| Time Remaining | Visual State | Audio Behavior |
-|----------------|--------------|----------------|
-| > 1/3 time | Green border, white text | Silent |
-| 1/3 - 1/6 time | Orange border & text | Single warning beep |
-| < 1/6 time | Red everything, pulsing background & font | Beep every turn |
+A Tampermonkey userscript that adds a draggable timer overlay to Chess.com with visual and audio feedback based on remaining time. **The script does not interact or interfere with the game in any way** - it only reads and displays timing information.
+ 
+<img width="289" height="231" alt="image" src="https://github.com/user-attachments/assets/656936de-5090-4da1-85a4-34649ab1ddc2"/>
+<img width="321" height="236" alt="image" src="https://github.com/user-attachments/assets/2df522c8-e4ff-4eb2-b41e-1503d22d0be5" />
+<img width="321" height="228" alt="image" src="https://github.com/user-attachments/assets/d8a4561f-ba54-4112-a2b9-f473705325d3" />
 
 ## Installation
 
-### Tampermonkey (Recommended)
 1. Install [Tampermonkey](https://www.tampermonkey.net/) browser extension
-2. Click "Create a new script"
-3. Copy and paste the entire script
-4. Save (Ctrl+S)
-5. Navigate to any that popular chess website  game
+2. Create a new script in Tampermonkey
+3. Copy and paste the userscript code
+4. Save and navigate to any Chess.com game
+5. The timer appears automatically during games
 
-### Other Userscript Managers
-Compatible with Greasemonkey, Violentmonkey, and similar extensions.
+![Chess Timer Demo](https://img.shields.io/badge/Chess.com-Compatible-green) ![Version](https://img.shields.io/badge/Version-0.15-blue)
 
-## Usage
+## Features
 
-1. **Start a game** on that popular chess website  - Timer appears automatically
-2. **Drag to position** - Click and drag to move anywhere on screen
-3. **Audio permissions** - Browser may ask for audio permission on first beep
-4. **Multiple games** - Timer resets automatically for each new game
+### Visual Display
+- Large 72px monospace font for time visibility
+- Color coding: Green → Orange → Red based on time remaining
+- Progress bar showing time remaining
+- Border pulsing during your turn
+- Font scaling and background pulsing during critical time
+- Dimmed display when not your turn
+- Cycling reminder text: "CHECKS | CAPTURES | THREATS" and "DEFENSES | IMPROVEMENTS"
+
+### Audio Notifications
+- Warning beep (800Hz) at 2/3 time remaining
+- Critical phase beep (1200Hz) at 5/6 time remaining
+- Double beep (1kHz) in final seconds (10s for ≤3min games, 30s for longer games)
+- Musical tune when time reaches zero
+- Fade-in/fade-out audio transitions
+
+### Interactive Features
+- Fully draggable - position anywhere on screen
+- Position saved between sessions
+- Automatic game detection and reset
+- Turn-based visual feedback
+
+## Time Phases
+
+| Time Remaining | Visual State | Audio Behavior |
+|----------------|--------------|----------------|
+| > 1/3 time | Green border, white text | None |
+| 1/3 - 1/6 time | Orange border and text | Single warning beep |
+| < 1/6 time | Red border and text, pulsing background | Critical beep on phase entry |
+| Final seconds | Red with font scaling | Double beep every second |
+| 0:00 | Time up display | Musical tune |
+
+## Browser Compatibility
+
+- Chrome/Chromium
+- Firefox  
+- Safari
+- Edge
 
 ## Technical Details
 
-### Browser Compatibility
-- ✅ Chrome/Chromium
-- ✅ Firefox
-- ✅ Safari
-- ✅ Edge
-
-### Performance
-- **Lightweight** - Updates every 200ms without impacting game performance
-- **Memory efficient** - Proper cleanup of audio contexts
-- **No external dependencies** - Pure JavaScript implementation
+- Updates every 500ms
+- Uses Web Audio API for sound generation
+- Pure JavaScript implementation
+- Minimal performance impact
+- Automatic cleanup of audio contexts
 
 ## Customization
 
-### Adjust Audio
+### Audio Settings
 ```javascript
-// Change beep frequencies (Hz)
+// Change beep frequencies
 playNote(800, 0.2);  // Warning beep
-playNote(1200, 0.2); // Critical beep
+playNote(1200, 0.1); // Critical beep
+playNote(1000, 0.1); // Double beep
 
 // Adjust volume (0.0 - 1.0)
 gainNode.gain.linearRampToValueAtTime(0.3, currentTime + fadeTime);
 ```
 
-### Modify Thresholds
-```javascript
-// Current thresholds
-elapsed >= startingSeconds * (2 / 3)  // Warning phase
-elapsed >= startingSeconds * (5 / 6)  // Critical phase
-```
-
-### Change Appearance
+### Visual Settings
 ```javascript
 // Font size
 timeText.style.fontSize = "72px";
 
-// Colors
-progressBar.style.backgroundColor = "#4caf50"; // Green
-timeText.style.color = "#ff9800";              // Orange
+// Phase thresholds
+elapsed >= startingSeconds * (2 / 3)  // Warning phase
+elapsed >= startingSeconds * (5 / 6)  // Critical phase
 ```
 
-## Development
+## Usage Notes
 
-### Script Structure
-- **Clock detection** - Monitors that popular chess website 's clock elements
-- **Phase calculation** - Determines current time phase
-- **Visual updates** - Manages colors, animations, and effects
-- **Audio system** - Handles Web Audio API for notifications
-- **Drag system** - Implements draggable functionality
-
-
-### Key Functions
-- `updateClock()` - Main update loop (200ms interval)
-- `playNote(pitch, duration)` - Audio notification system
-- `startFontPulse()` / `stopFontPulse()` - Font scaling effects
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Test on that popular chess website 
-4. Submit a pull request
-
-### Roadmap
-- [ ] Sound volume controls
-- [ ] Multiple timer themes
-- [ ] Position memory
-- [ ] Tournament mode features
+- Browser may request audio permission on first sound
+- Timer automatically adapts to different time controls
+- Position is saved in browser localStorage
+- Only displays during active games on Chess.com
 
 ## License
 
-MIT License - Feel free to modify and distribute.
-
-## Support
-
-- **Issues** - Report bugs via GitHub issues
-- **Compatibility** - Tested on that popular chess website 's current interface
-- **Updates** - Script auto-updates through Tampermonkey
-
----
-
-*Enhance that popular chess website experience with better time awareness! *
+MIT License
