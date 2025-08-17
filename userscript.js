@@ -248,7 +248,14 @@
     function startDoubleBeep() {
         if (doubleBeepInterval) return;
         playDoubleBeep();
-        doubleBeepInterval = setInterval(playDoubleBeep, 1000);
+        doubleBeepInterval = setInterval(() => {
+            // Check if time is up before playing beep
+            const currentTimeStr = myClockElem ? myClockElem.textContent.trim() : "";
+            const isTimeUp = currentTimeStr === "0:00" || (currentTimeStr.includes(':') && parseFloat(currentTimeStr.split(':')[1]) <= 0.1);
+            if (!isTimeUp) {
+                playDoubleBeep();
+            }
+        }, 1000);
     }
 
     function stopDoubleBeep() {
