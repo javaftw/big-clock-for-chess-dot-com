@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Big Floating Chess Timer
 // @namespace    http://tampermonkey.net/
-// @version      0.14
-// @description  Positionable clock with progress bar, instant movement, turn-based border pulse, and dynamic visual alerts
+// @version      0.15
+// @description  Positionable clock with progress bar, instant movement, turn-based border pulse, dynamic visual alerts, and double beep for final seconds
 // @author       javaftw
 // @match        https://www.chess.com/game/*
 // @grant        none
@@ -110,6 +110,8 @@
     let myTurnClock = null;
     let myClockElem = null;
     let cachedElements = false;
+    let doubleBeepInterval = null;
+    let hasPlayedTimeUpTune = false;
 
     // Position persistence functions
     function savePosition() {
@@ -189,8 +191,8 @@
         if (!str.includes(':')) return null;
         const [minStr, secStr] = str.split(':');
         const min = parseInt(minStr);
-        const sec = parseInt(secStr);
-        return min * 60 + sec;
+        const sec = parseFloat(secStr);
+        return min * 60 + Math.floor(sec);
     }
 
     function playNote(pitch, duration) {
@@ -218,6 +220,41 @@
             };
         } catch (e) {
             console.log('Audio error:', e);
+        }
+    }
+
+    function playDoubleBeep() {
+        playNote(1000, 0.1);
+        setTimeout(() => playNote(1000, 0.1), 200);
+    }
+
+    function playTimeUpTune() {
+        const notes = [
+            { freq: 523, duration: 0.2 }, // C5
+            { freq: 659, duration: 0.2 }, // E5
+            { freq: 784, duration: 0.2 }, // G5
+            { freq: 1047, duration: 0.4 }, // C6
+            { freq: 784, duration: 0.2 }, // G5
+            { freq: 1047, duration: 0.6 }  // C6 (longer)
+        ];
+        
+        let delay = 0;
+        notes.forEach(note => {
+            setTimeout(() => playNote(note.freq, note.duration), delay * 1000);
+            delay += note.duration;
+        });
+    }
+
+    function startDoubleBeep() {
+        if (doubleBeepInterval) return;
+        playDoubleBeep();
+        doubleBeepInterval = setInterval(playDoubleBeep, 1000);
+    }
+
+    function stopDoubleBeep() {
+        if (doubleBeepInterval) {
+            clearInterval(doubleBeepInterval);
+            doubleBeepInterval = null;
         }
     }
 
@@ -261,16 +298,55 @@
         if (startingSeconds == null || currentSeconds > startingSeconds) {
             startingSeconds = currentSeconds;
             hasPlayedWarningBeep = false;
+            hasPlayedTimeUpTune = false;
+        }
+
+        // Check if time has reached zero - use string comparison for accuracy
+        if (isMyTurn && timeStr === "0:00" && !hasPlayedTimeUpTune) {
+            stopDoubleBeep();
+            stopFontPulse();
+            playTimeUpTune();
+            hasPlayedTimeUpTune = true;
+        }
+
+        // Skip normal phase logic if time is at zero
+        if (timeStr === "0:00") {
+            return;
         }
 
         const elapsed = startingSeconds - currentSeconds;
-        timeText.textContent = timeStr;
+        
+        // Adjust display time by subtracting 0.1s to stay in sync with chess.com
+        let displayTime = timeStr;
+        if (timeStr.includes('.')) {
+            const [minStr, secStr] = timeStr.split(':');
+            const totalSeconds = parseInt(minStr) * 60 + parseFloat(secStr);
+            const adjustedSeconds = Math.max(0, totalSeconds - 0.1);
+            const adjustedMin = Math.floor(adjustedSeconds / 60);
+            const adjustedSec = adjustedSeconds % 60;
+            
+            if (adjustedSeconds < 10) {
+                displayTime = `${adjustedMin}:${adjustedSec.toFixed(1).padStart(4, '0')}`;
+            } else {
+                displayTime = `${adjustedMin}:${Math.floor(adjustedSec).toString().padStart(2, '0')}`;
+            }
+        }
+        
+        timeText.textContent = displayTime;
 
         bigClock.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
         progressBar.style.backgroundColor = "#4caf50";
         bigClock.style.animation = "none";
         bigClock.style.boxShadow = "0 0 10px rgba(0,0,0,0.7)";
         timeText.style.color = isMyTurn ? "white" : "#555";
+
+        // Determine if we're in the final seconds phase
+        const finalSecondsThreshold = startingSeconds <= 180 ? 10 : 30;
+        const inFinalSeconds = isMyTurn && currentSeconds <= finalSecondsThreshold;
+
+        if (!isMyTurn) {
+            stopDoubleBeep();
+        }
 
         if (isMyTurn) {
             startWordCycle();
@@ -282,6 +358,7 @@
                 timeText.style.color = "#ff9800";
                 progressBar.style.backgroundColor = "#ff9800";
                 stopFontPulse();
+                stopDoubleBeep();
                 currentPhase = 'warning';
                 if (!hasPlayedWarningBeep) {
                     playNote(800, 0.2);
@@ -292,13 +369,21 @@
                 timeText.style.color = "white";
                 progressBar.style.backgroundColor = "red";
                 bigClock.style.animation = "pulseRedBG 0.5s infinite";
-                startFontPulse();
                 currentPhase = 'critical';
-                if (lastPhase !== 'critical') {
-                    playNote(1200, 0.1);
+                
+                if (inFinalSeconds) {
+                    startFontPulse();
+                    startDoubleBeep();
+                } else {
+                    startFontPulse();
+                    stopDoubleBeep();
+                    if (lastPhase !== 'critical') {
+                        playNote(1200, 0.1);
+                    }
                 }
             } else {
                 stopFontPulse();
+                stopDoubleBeep();
                 hasPlayedWarningBeep = false;
             }
 
@@ -308,6 +393,7 @@
         } else {
             stopWordCycle(false);
             stopFontPulse();
+            stopDoubleBeep();
             lastPhase = 'normal';
         }
 
