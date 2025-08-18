@@ -112,6 +112,7 @@
     let cachedElements = false;
     let doubleBeepInterval = null;
     let hasPlayedTimeUpTune = false;
+    let audioContext = null;
 
     // Position persistence functions
     function savePosition() {
@@ -195,18 +196,29 @@
         return min * 60 + Math.floor(sec);
     }
 
+    function getAudioContext() {
+        if (!audioContext || audioContext.state === 'closed') {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        return audioContext;
+    }
+
     function playNote(pitch, duration) {
         try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
+            const context = getAudioContext();
+            if (context.state === 'suspended') {
+                context.resume();
+            }
+
+            const oscillator = context.createOscillator();
             oscillator.type = 'sine';
             oscillator.frequency.value = pitch;
-            const gainNode = audioContext.createGain();
+            const gainNode = context.createGain();
             oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            gainNode.connect(context.destination);
             gainNode.gain.value = 0;
             const fadeTime = Math.min(duration * 0.1, 0.1);
-            const currentTime = audioContext.currentTime;
+            const currentTime = context.currentTime;
             gainNode.gain.linearRampToValueAtTime(0.3, currentTime + fadeTime);
             gainNode.gain.linearRampToValueAtTime(0, currentTime + duration - fadeTime);
             oscillator.start(currentTime);
@@ -214,9 +226,6 @@
             oscillator.onended = () => {
                 gainNode.disconnect();
                 oscillator.disconnect();
-                if (audioContext.state !== 'closed') {
-                    audioContext.close().catch(e => console.error('Error closing audio context:', e));
-                }
             };
         } catch (e) {
             console.log('Audio error:', e);
@@ -237,7 +246,7 @@
             { freq: 784, duration: 0.2 }, // G5
             { freq: 1047, duration: 0.6 }  // C6 (longer)
         ];
-        
+
         let delay = 0;
         notes.forEach(note => {
             setTimeout(() => playNote(note.freq, note.duration), delay * 1000);
@@ -324,7 +333,7 @@
         }
 
         const elapsed = startingSeconds - currentSeconds;
-        
+
         // Adjust display time by subtracting 0.1s to stay in sync with chess.com
         let displayTime = timeStr;
         if (timeStr.includes('.')) {
@@ -333,14 +342,14 @@
             const adjustedSeconds = Math.max(0, totalSeconds - 0.1);
             const adjustedMin = Math.floor(adjustedSeconds / 60);
             const adjustedSec = adjustedSeconds % 60;
-            
+
             if (adjustedSeconds < 10) {
                 displayTime = `${adjustedMin}:${adjustedSec.toFixed(1).padStart(4, '0')}`;
             } else {
                 displayTime = `${adjustedMin}:${Math.floor(adjustedSec).toString().padStart(2, '0')}`;
             }
         }
-        
+
         timeText.textContent = displayTime;
 
         bigClock.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
@@ -379,7 +388,7 @@
                 progressBar.style.backgroundColor = "red";
                 bigClock.style.animation = "pulseRedBG 0.5s infinite";
                 currentPhase = 'critical';
-                
+
                 if (inFinalSeconds) {
                     startFontPulse();
                     startDoubleBeep();
